@@ -13,16 +13,16 @@ jobs:
         
     steps:
       - name: build_x264
-        run: ./build.sh -t x264
+        run: ./vobuild/build.sh -t x264
         
       - name: build_x265
-        run: ./build.sh -t x265
+        run: ./vobuild/build.sh -t x265
         
       - name: build_vmaf
-        run: ./build.sh -t vmaf
+        run: ./vobuild/build.sh -t vmaf
 
       - name: build_eagle
-        run: ./build.sh -t eagle
+        run: ./vobuild/build.sh -t eagle
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
