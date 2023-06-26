@@ -16,16 +16,24 @@ jobs:
         uses: actions/checkout@v3
 
       - name: build_x264
-        run: ./vobuild/build.sh -t x264
+        run: |
+          cd vobuild
+          ./build.sh -t x264
         
       - name: build_x265
-        run: ./vobuild/build.sh -t x265
+        run: |
+          cd vobuild
+          ./build.sh -t x265
         
       - name: build_vmaf
-        run: ./vobuild/build.sh -t vmaf
+        run: |
+          cd vobuild
+          ./build.sh -t vmaf
 
       - name: build_eagle
-        run: ./vobuild/build.sh -t eagle
+        run: |
+          cd vobuild
+          ./build.sh -t eagle
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
