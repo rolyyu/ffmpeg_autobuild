@@ -34,7 +34,7 @@ jobs:
       
   publish_release:
     name: Publish release
-    needs: build_ffmpeg
+    needs: build
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
