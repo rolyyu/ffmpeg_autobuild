@@ -12,6 +12,9 @@ jobs:
         os: [win64, ubuntu]
         
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: build_x264
         run: ./vobuild/build.sh -t x264
         
