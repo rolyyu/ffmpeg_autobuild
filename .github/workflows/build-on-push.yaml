@@ -7,8 +7,20 @@ on:
 jobs:
   build:
     name: Build FFmpeg
-    runs-on: windows-2019
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        name: [
+          windows-x86_64,
+          ubuntu-x86_64
+        ]
+        include:
+          - name: windows-x86_64
+            os: windows-2019
+          - name: ubuntu-x86_64
+            os: ubuntu-20.04
     defaults:
+      if: runner.os == 'Windows'
       run:
         shell: msys2 {0}
         
@@ -17,33 +29,34 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Using msys2
+        if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
 
-      - name: Build x264
-        working-directory: vobuild
-        run: ./build.sh -t x264
+      # - name: Build x264
+      #   working-directory: vobuild
+      #   run: ./build.sh -t x264
 
-      - name: Build x265
-        working-directory: vobuild
-        run: ./build.sh -t x265
+      # - name: Build x265
+      #   working-directory: vobuild
+      #   run: ./build.sh -t x265
 
       - name: Build vmaf
         working-directory: vobuild
         run: ./build.sh -t vmaf
 
-      - name: Build eagle
-        working-directory: vobuild
-        run: ./build.sh -t eagle
+      # - name: Build eagle
+      #   working-directory: vobuild
+      #   run: ./build.sh -t eagle
 
       - name: Prepare Asset
         working-directory: vobuild
-        run: tar -czvf ffmpeg-${{ matrix.os }}.tar.gz install/
+        run: tar -czvf ffmpeg-windows-win64.tar.gz install/
           
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ffmpeg-windows-win64
-          path: ffmpeg-windows-win64.tar.gz
+          name: ffmpeg-${{ matrix.name }}
+          path: ffmpeg-${{ matrix.name }}.tar.gz
 
     outputs:
       date-time-before: ${{ steps.date-time-before.outputs.date-time }}
@@ -56,17 +69,23 @@ jobs:
     needs: build
     runs-on: ubuntu-20.04
     steps:
-      - name: Download windows-win64 Artifacts
+      - name: Download windows-x86_64 Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ffmpeg-windows-win64
-          path: ffmpeg-windows-win64.tar.gz
+          name: ffmpeg-windows-x86_64
+          path: ffmpeg-windows-x86_64.tar.gz
+
+      - name: Download ubuntu-x86_64 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ffmpeg-ubuntu-x86_64
+          path: ffmpeg-ubuntu-x86_64.tar.gz
 
       - name: Release
         run: |
           gh release create "m-${{ needs.build.outputs.date-time-after-tag }}" \
-          "ffmpeg-windows-win64.tar.gz" \
-          "ffmpeg-ubuntu_focal-amd64.tar.gz" \
+          "ffmpeg-windows-x86_64.tar.gz" \
+          "ffmpeg-ubuntu-x86_64.tar.gz" \
           -n "FFmpeg git-${{ needs.build.outputs.git-sha }} in ${{ needs.build.outputs.git-date }} built on ${{ needs.build.outputs.date-time-after }} started at ${{ needs.build.outputs.date-time-before }}
           Using ffmpeg-windows-build-helpers git-${{ needs.build.outputs.helper-git-sha }}" \
           -t "${{ needs.build.outputs.date-time-after }} ${{ needs.build.outputs.git-sha }}"
