@@ -50,13 +50,11 @@ jobs:
       #   run: ./build.sh -t eagle
 
       - name: Prepare Artifacts
-        working-directory: vobuild
         run: |
-          mv install ffmpeg-${{ matrix.name }}
+          mv vobuild/install ffmpeg-${{ matrix.name }}
           tar -czvf ffmpeg-${{ matrix.name }}.tar.gz ffmpeg-${{ matrix.name }}/
           
       - name: Upload Artifacts
-        working-directory: vobuild
         uses: actions/upload-artifact@v3
         with:
           name: ffmpeg-${{ matrix.name }}
