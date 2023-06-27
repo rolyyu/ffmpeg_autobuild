@@ -6,67 +6,72 @@ on:
   
 jobs:
   build:
+    name: Build FFmpeg
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [win64, ubuntu]
+        os: [windows-win64, ubuntu_focal-amd64]
         
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: build_x264
-        run: |
-          cd vobuild
-          ./build.sh -t x264
-        
-      - name: build_x265
-        run: |
-          cd vobuild
-          ./build.sh -t x265
-        
-      - name: build_vmaf
-        run: |
-          cd vobuild
-          ./build.sh -t vmaf
+      - name: Build x264
+        working-directory: vobuild
+        run: ./build.sh -t x264
 
-      - name: build_eagle
-        run: |
-          cd vobuild
-          ./build.sh -t eagle
+      - name: Build x265
+        working-directory: vobuild
+        run: ./build.sh -t x265
+
+      - name: Build vmaf
+        working-directory: vobuild
+        run: ./build.sh -t vmaf
+
+      - name: Build eagle
+        working-directory: vobuild
+        run: ./build.sh -t eagle
+
+      - name: Prepare Asset
+        working-directory: vobuild
+        run: tar -C install -zcvf ffmpeg-${{ matrix.os }}.tar.gz .
           
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: ffmpeg_build
-          path: |
-            vobuild/install/
-          if-no-files-found: ignore
-      
-  publish_release:
-    name: Publish release
+          name: ffmpeg-${{ matrix.os }}
+          path: ffmpeg-${{ matrix.os }}.tar.gz
+
+    outputs:
+      date-time-before: ${{ steps.date-time-before.outputs.date-time }}
+      date-time-after: ${{ steps.date-time-after.outputs.date-time }}
+      date-time-after-tag: ${{ steps.date-time-after.outputs.date-time-tag }}
+      helper-git-sha: ${{ steps.helper-git-sha.outputs.git-sha }}
+  publish:
+    name: Publish Release
     needs: build
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Download artifacts
-        uses: actions/download-artifact@v2
+      - name: Download windows-win64 Artifacts
+        uses: actions/download-artifact@v3
         with:
-          name: ffmpeg_build
-          path: vobuild/install/
-      - name: Compress upload files
+          name: ffmpeg-windows-win64
+          path: ffmpeg-windows-win64.tar.gz
+
+      - name: Download ubuntu_focal-amd64 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ffmpeg-ubuntu_focal-amd64
+          path: ffmpeg-ubuntu_focal-amd64.tar.gz
+
+      - name: Release
         run: |
-          cd vobuild/install/
-          for FILE in ./*;do cd $(basename $FILE); FILE_NAME="win32_$(basename $FILE)_$(date +'%Y%m%d').zip"; FILE_NAME=${FILE_NAME/ffmpeg_git_lgpl/ffmpeg_lgpl}; FILE_NAME=${FILE_NAME/ffmpeg_git/ffmpeg_gpl}; if [[ $FILE_NAME == *"shared"* ]];then rm ./*.exe;fi; echo Compressing $FILE_NAME...; zip -r ../../../$FILE_NAME ./; cd ../;done
-      - name: Create Release
-        run: |
-          set -e
-          NAME="FFmpeg $(date +'%Y-%m-%d')"
-          TAGNAME="workflow-$(date +'%Y%m%d%H%M')"
-          echo "Creating draft tag: $TAGNAME"
-          hub release create --draft $(for zip in ./win*.zip; do echo --attach $zip; done) -m "$NAME" -t "main" "$TAGNAME"
-          echo "Created draft tag: $TAGNAME"
-          echo "Publishing draft tag: $TAGNAME"
-          hub release edit --draft=false $TAGNAME -m ""
-          echo "Published draft tag: $TAGNAME"
+          gh release create "m-${{ needs.build.outputs.date-time-after-tag }}" \
+          "ffmpeg-windows-win64.tar.gz" \
+          "ffmpeg-ubuntu_focal-amd64.tar.gz" \
+          -n "FFmpeg git-${{ needs.build.outputs.git-sha }} in ${{ needs.build.outputs.git-date }} built on ${{ needs.build.outputs.date-time-after }} started at ${{ needs.build.outputs.date-time-before }}
+          Using ffmpeg-windows-build-helpers git-${{ needs.build.outputs.helper-git-sha }}" \
+          -t "${{ needs.build.outputs.date-time-after }} ${{ needs.build.outputs.git-sha }}"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}

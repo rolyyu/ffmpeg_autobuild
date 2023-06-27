@@ -13,7 +13,6 @@ echo "Build x264"
 cd $x264_dir
   ./configure \
     --prefix=$INSTALL_DIR \
-    --enable-static \
     --enable-shared \
     --enable-pic
   make -j$cpu_count

@@ -67,19 +67,19 @@ cd $eagle_dir
     --cross-prefix=x86_64-w64-mingw32-"
 
   if ENABLE_GPL; then
-    init_options+="$gpl_options $ext_libs_options" 
+    init_options+="$gpl_options" 
   fi
 
   if Linux; then
-    configure_options="$init_options $vmaf_options $static_shared_options $linux_options"
+    configure_options="$init_options $vmaf_options $shared_options $linux_options"
     if CROSS_MINGW64; then
-      configure_options="$init_options $mingw64_options $static_shared_options $linux_options"
+      configure_options="$init_options $mingw64_options $shared_options $linux_options"
       make clean
     fi
   fi
 
   if MacOS; then
-    configure_options="$init_options $vmaf_options $static_shared_options"
+    configure_options="$init_options $vmaf_options $shared_options"
   fi
 
   if Windows; then
