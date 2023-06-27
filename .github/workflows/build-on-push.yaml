@@ -49,12 +49,12 @@ jobs:
       #   working-directory: vobuild
       #   run: ./build.sh -t eagle
 
-      - name: Prepare Artifacts
+      - name: Prepare artifacts
         run: |
           mv vobuild/install ffmpeg-${{ matrix.name }}
           tar -czvf ffmpeg-${{ matrix.name }}.tar.gz ffmpeg-${{ matrix.name }}/
           
-      - name: Upload Artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ffmpeg-${{ matrix.name }}
@@ -68,15 +68,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download windows-x86_64 Artifacts
+      - name: Download windows-x86_64 artifacts
         uses: actions/download-artifact@v3
         with:
           name: ffmpeg-windows-x86_64
 
-      - name: Download ubuntu-x86_64 Artifacts
+      - name: Download ubuntu-x86_64 artifacts
         uses: actions/download-artifact@v3
         with:
           name: ffmpeg-ubuntu-x86_64
+
+      - name: Create docker image from ubuntu-x86_64 artifacts
+        run: |
+          tar -xf ffmpeg-ubuntu-x86_64.tar.gz
+          docker image build -t ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/} .
+          docker save ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/} | gzip > vooptimizer.tar.gz
+          docker image rm ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/}
 
       - name: Release
         run: |
