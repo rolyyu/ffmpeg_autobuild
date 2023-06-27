@@ -82,8 +82,9 @@ jobs:
         working-directory: vobuild
         run: |
           tar -xf ../ffmpeg-ubuntu-x86_64.tar.gz
+          mv ffmpeg-ubuntu-x86_64 install
           docker image build -t ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/} .
-          docker save ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/} | gzip > vooptimizer.tar.gz
+          docker save ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/} | gzip > ffmpeg-docker.tar.gz
           docker image rm ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/}
 
       - name: Release
