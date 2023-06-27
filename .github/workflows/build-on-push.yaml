@@ -7,10 +7,13 @@ on:
 jobs:
   build:
     name: Build FFmpeg
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-win64, ubuntu_focal-amd64]
+        name: [windows-win64, ubuntu_focal-amd64]
+        os: [windows-2019, ubuntu-20.04]
+    env:
+      CC: gcc
         
     steps:
       - name: Checkout repository
@@ -34,13 +37,13 @@ jobs:
 
       - name: Prepare Asset
         working-directory: vobuild
-        run: tar -C install -zcvf ffmpeg-${{ matrix.os }}.tar.gz .
+        run: tar -czvf ffmpeg-${{ matrix.name }}.tar.gz install/
           
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ffmpeg-${{ matrix.os }}
-          path: ffmpeg-${{ matrix.os }}.tar.gz
+          name: ffmpeg-${{ matrix.name }}
+          path: ffmpeg-${{ matrix.name }}.tar.gz
 
     outputs:
       date-time-before: ${{ steps.date-time-before.outputs.date-time }}
