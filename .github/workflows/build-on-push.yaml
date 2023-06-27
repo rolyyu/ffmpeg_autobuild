@@ -75,13 +75,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ffmpeg-windows-x86_64
-          path: ffmpeg-windows-x86_64.tar.gz
 
       - name: Download ubuntu-x86_64 Artifacts
         uses: actions/download-artifact@v3
         with:
           name: ffmpeg-ubuntu-x86_64
-          path: ffmpeg-ubuntu-x86_64.tar.gz
 
       - name: Release
         run: |
