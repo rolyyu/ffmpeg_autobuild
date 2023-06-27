@@ -93,7 +93,8 @@ jobs:
           -t ${GITHUB_REF#refs/*/} \
           -F RELEASE_NOTES \
           "ffmpeg-windows-x86_64.tar.gz" \
-          "ffmpeg-ubuntu-x86_64.tar.gz"
+          "ffmpeg-ubuntu-x86_64.tar.gz" \
+          "ffmpeg-docker.tar.gz"
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
