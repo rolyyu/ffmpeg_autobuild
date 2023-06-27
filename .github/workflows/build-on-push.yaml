@@ -83,7 +83,7 @@ jobs:
 
       - name: Release
         run: |
-          gh release create "m-${{ needs.build.outputs.date-time-after-tag }}" \
+          gh release create "v1.0" \
           "ffmpeg-windows-x86_64.tar.gz" \
           "ffmpeg-ubuntu-x86_64.tar.gz" \
           -n "FFmpeg git-${{ needs.build.outputs.git-sha }} in ${{ needs.build.outputs.git-date }} built on ${{ needs.build.outputs.date-time-after }} started at ${{ needs.build.outputs.date-time-before }}
