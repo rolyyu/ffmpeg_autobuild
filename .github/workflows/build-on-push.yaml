@@ -17,12 +17,13 @@ jobs:
         include:
           - name: windows-x86_64
             os: windows-2019
+            shell: 'msys2 {0}'
           - name: ubuntu-x86_64
             os: ubuntu-20.04
+            shell: bash
     defaults:
-      if: runner.os == 'Windows'
       run:
-        shell: msys2 {0}
+        shell: ${{ matrix.shell }}
         
     steps:
       - name: Checkout repository
