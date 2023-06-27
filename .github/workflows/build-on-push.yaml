@@ -49,9 +49,9 @@ jobs:
       #   working-directory: vobuild
       #   run: ./build.sh -t eagle
 
-      - name: Prepare Asset
+      - name: Prepare Artifacts
         working-directory: vobuild
-        run: tar -czvf ffmpeg-windows-win64.tar.gz install/
+        run: tar -czvf ffmpeg-${{ matrix.name }}.tar.gz install/
           
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
