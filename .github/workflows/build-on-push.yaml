@@ -1,4 +1,4 @@
-name: Build FFmpeg on push
+name: 🏗️ Build FFmpeg on push
 on:
   push:
     paths:
@@ -33,21 +33,21 @@ jobs:
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
 
-      # - name: Build x264
-      #   working-directory: vobuild
-      #   run: ./build.sh -t x264
+      - name: Build x264
+        working-directory: vobuild
+        run: ./build.sh -t x264
 
-      # - name: Build x265
-      #   working-directory: vobuild
-      #   run: ./build.sh -t x265
+      - name: Build x265
+        working-directory: vobuild
+        run: ./build.sh -t x265
 
       - name: Build vmaf
         working-directory: vobuild
         run: ./build.sh -t vmaf
 
-      # - name: Build eagle
-      #   working-directory: vobuild
-      #   run: ./build.sh -t eagle
+      - name: Build eagle
+        working-directory: vobuild
+        run: ./build.sh -t eagle
 
       - name: Prepare artifacts
         run: |
