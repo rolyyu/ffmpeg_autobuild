@@ -78,19 +78,25 @@ jobs:
         with:
           name: ffmpeg-ubuntu-x86_64
 
+      - name: Add SHORT_SHA env property with commit short sha
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+
       - name: Create docker image from ubuntu-x86_64 artifacts
         working-directory: vobuild
         run: |
           tar -xf ../ffmpeg-ubuntu-x86_64.tar.gz
           mv ffmpeg-ubuntu-x86_64 install
-          docker image build -t ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/}-${GITHUB_SHA} .
-          docker save ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/}-${GITHUB_SHA} | gzip > ../ffmpeg-docker.tar.gz
-          docker image rm ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/}-${GITHUB_SHA}
+          DOCKERNAME=ffmpeg-ubuntu-x86_64:${GITHUB_REF#refs/*/}-${SHORT_SHA}
+          docker image build -t ${DOCKERNAME} .
+          docker save ${DOCKERNAME} | gzip > ../ffmpeg-docker.tar.gz
+          docker image rm ${DOCKERNAME}
 
       - name: Release
         run: |
-          gh release create ${GITHUB_REF#refs/*/}-${GITHUB_SHA} \
-          -t ${GITHUB_REF#refs/*/} \
+          NAME="Auto-Build $(date +'%Y-%m-%d %H:%M') ${SHORT_SHA}"
+          TAGNAME="autobuild-$(date +'%Y-%m-%d-%H-%M')-${SHORT_SHA}"
+          gh release create ${TAGNAME} \
+          -t ${NAME} \
           -F RELEASE_NOTES \
           "ffmpeg-windows-x86_64.tar.gz" \
           "ffmpeg-ubuntu-x86_64.tar.gz" \
