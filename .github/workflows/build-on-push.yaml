@@ -95,8 +95,8 @@ jobs:
         run: |
           NAME="Auto-Build $(date +'%Y-%m-%d %H:%M') ${SHORT_SHA}"
           TAGNAME="autobuild-$(date +'%Y-%m-%d-%H-%M')-${SHORT_SHA}"
-          gh release create ${TAGNAME} \
-          -t ${NAME} \
+          gh release create "${TAGNAME}" \
+          -t "${NAME}" \
           -F RELEASE_NOTES \
           "ffmpeg-windows-x86_64.tar.gz" \
           "ffmpeg-ubuntu-x86_64.tar.gz" \
